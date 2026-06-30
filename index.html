@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<title>Examen - AppADay 054</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500;1,600&family=Nunito:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dusk: #0c0f18;
+    --dusk-card: #141a29;
+    --dusk-card-raised: #1a2236;
+    --dusk-rule: rgba(232,163,61,0.14);
+    --candle: #e8a33d;
+    --candle-dim: rgba(232,163,61,0.16);
+    --candle-soft: rgba(232,163,61,0.45);
+    --parchment: #f0e9da;
+    --muted: #8b93a8;
+    --ember: #c1542a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--dusk);
+    color: var(--parchment);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 50% 18%, rgba(232,163,61,0.07), transparent 70%),
+      radial-gradient(ellipse 800px 600px at 50% 100%, rgba(20,26,41,0.6), transparent);
+  }
+
+  header {
+    position: relative;
+    z-index: 5;
+    padding: 18px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--dusk-rule);
+    gap: 12px;
+  }
+
+  .back-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s ease;
+  }
+  .back-link:hover { color: var(--candle); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .app-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  .gear-btn {
+    background: transparent;
+    border: 1px solid var(--dusk-rule);
+    color: var(--muted);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+  .gear-btn:hover { color: var(--candle); border-color: var(--candle-soft); }
+
+  main {
+    flex: 1;
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 28px 20px 60px;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ---- progress trail ---- */
+  .trail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 36px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .trail.show { opacity: 1; }
+  .trail-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(240,233,218,0.16);
+    transition: background 0.4s ease, transform 0.4s ease;
+  }
+  .trail-dot.done { background: var(--candle-soft); }
+  .trail-dot.active { background: var(--candle); transform: scale(1.4); box-shadow: 0 0 10px var(--candle-soft); }
+  .trail-line { width: 18px; height: 1px; background: rgba(240,233,218,0.12); }
+
+  /* ---- screens ---- */
+  .screen {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: rise 0.6s ease both;
+  }
+  .screen.active { display: flex; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ---- candle signature ---- */
+  .candle-wrap {
+    width: 100%;
+    max-width: 120px;
+    margin: 0 auto 22px;
+  }
+  .flame {
+    transform-origin: 60px 88px;
+    animation: flicker 3.2s ease-in-out infinite;
+  }
+  @keyframes flicker {
+    0%, 100% { transform: scaleY(1) scaleX(1) rotate(0deg); opacity: 1; }
+    20% { transform: scaleY(1.05) scaleX(0.97) rotate(-1.5deg); opacity: 0.96; }
+    40% { transform: scaleY(0.95) scaleX(1.03) rotate(1deg); opacity: 1; }
+    60% { transform: scaleY(1.08) scaleX(0.95) rotate(-0.8deg); opacity: 0.92; }
+    80% { transform: scaleY(0.97) scaleX(1.02) rotate(1.4deg); opacity: 1; }
+  }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--candle);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(38px, 9vw, 56px);
+    line-height: 1.04;
+    margin-bottom: 18px;
+    color: var(--parchment);
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(30px, 7.5vw, 42px);
+    line-height: 1.1;
+    margin-bottom: 16px;
+    color: var(--parchment);
+  }
+
+  .lede {
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 420px;
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  .prompt {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(19px, 4.6vw, 23px);
+    line-height: 1.55;
+    color: var(--parchment);
+    max-width: 440px;
+    margin-bottom: 28px;
+  }
+
+  .movements-list {
+    text-align: left;
+    width: 100%;
+    max-width: 380px;
+    margin-bottom: 34px;
+  }
+  .movement-row {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--dusk-rule);
+  }
+  .movement-row:last-child { border-bottom: none; }
+  .movement-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--candle);
+    width: 18px;
+    flex-shrink: 0;
+  }
+  .movement-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--parchment);
+  }
+
+  /* ---- breathing ring ---- */
+  .breathe-zone {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 26px;
+  }
+  .ring-outer {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    border: 1px solid var(--dusk-rule);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .ring-inner {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--candle-dim);
+    border: 1px solid var(--candle-soft);
+    transition: transform 4s ease-in-out, opacity 4s ease-in-out;
+  }
+  .ring-inner.breathe-in { transform: scale(1.35); opacity: 0.9; }
+  .ring-inner.breathe-out { transform: scale(0.85); opacity: 0.55; }
+  .breathe-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  textarea {
+    width: 100%;
+    max-width: 440px;
+    min-height: 110px;
+    background: var(--dusk-card);
+    border: 1px solid var(--dusk-rule);
+    border-radius: 6px;
+    color: var(--parchment);
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.6;
+    padding: 16px;
+    resize: vertical;
+    margin-bottom: 18px;
+    transition: border-color 0.2s ease;
+  }
+  textarea::placeholder { color: rgba(139,147,168,0.55); font-style: italic; }
+  textarea:focus {
+    outline: none;
+    border-color: var(--candle-soft);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  button {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 14px 26px;
+    transition: all 0.2s ease;
+  }
+  button:focus-visible { outline: 2px solid var(--candle); outline-offset: 2px; }
+
+  .btn-primary {
+    background: var(--candle);
+    border: 1px solid var(--candle);
+    color: var(--dusk);
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: #f3b659; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--dusk-rule);
+    color: var(--muted);
+  }
+  .btn-ghost:hover { border-color: var(--candle-soft); color: var(--candle); }
+
+  .btn-ember {
+    background: transparent;
+    border: 1px solid rgba(193,84,42,0.4);
+    color: #d97a52;
+  }
+  .btn-ember:hover { border-color: var(--ember); color: #f0926a; background: rgba(193,84,42,0.08); }
+  .btn-ember:disabled { opacity: 0.45; cursor: progress; }
+
+  /* ---- virtue grid ---- */
+  .virtue-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 22px;
+  }
+  .virtue-card {
+    background: var(--dusk-card);
+    border: 1px solid var(--dusk-rule);
+    border-radius: 6px;
+    padding: 14px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  .virtue-card:hover, .virtue-card:focus-visible {
+    border-color: var(--candle-soft);
+    background: var(--dusk-card-raised);
+    transform: translateY(-2px);
+  }
+  .virtue-type {
+    font-family: 'DM Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--candle);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .virtue-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--parchment);
+  }
+
+  /* ---- modal overlay ---- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6,8,13,0.78);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-card {
+    background: var(--dusk-card-raised);
+    border: 1px solid var(--dusk-rule);
+    border-radius: 10px;
+    padding: 30px 26px;
+    max-width: 420px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    text-align: left;
+    animation: rise 0.3s ease both;
+  }
+  .modal-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--candle);
+    margin-bottom: 10px;
+  }
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 30px;
+    color: var(--parchment);
+    margin-bottom: 14px;
+  }
+  .modal-body {
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 22px;
+  }
+  .modal-body strong { color: var(--parchment); font-weight: 500; }
+  .modal-close-row { display: flex; justify-content: flex-end; gap: 10px; }
+
+  .settings-field-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .settings-input {
+    width: 100%;
+    background: var(--dusk-card);
+    border: 1px solid var(--dusk-rule);
+    border-radius: 6px;
+    color: var(--parchment);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  .settings-input:focus { outline: none; border-color: var(--candle-soft); }
+  .settings-note {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+  .settings-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    color: var(--candle);
+    margin-bottom: 4px;
+    min-height: 14px;
+  }
+
+  /* ---- AI reflection ---- */
+  .ai-zone {
+    width: 100%;
+    max-width: 440px;
+    margin-bottom: 10px;
+  }
+  .ai-results {
+    display: none;
+    background: var(--dusk-card);
+    border: 1px solid rgba(193,84,42,0.3);
+    border-radius: 6px;
+    padding: 18px 18px;
+    margin-top: 16px;
+    text-align: left;
+  }
+  .ai-results.show { display: block; }
+  .ai-results-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #d97a52;
+    margin-bottom: 10px;
+  }
+  .ai-results-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--parchment);
+    font-weight: 300;
+    white-space: pre-wrap;
+  }
+  .ai-results-disclaimer {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+  .ai-error {
+    display: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ember);
+    margin-top: 10px;
+  }
+  .ai-error.show { display: block; }
+
+  /* ---- closing screen ---- */
+  .closing-prayer {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(20px, 5vw, 25px);
+    line-height: 1.7;
+    color: var(--parchment);
+    max-width: 420px;
+    margin-bottom: 30px;
+  }
+
+  .nights-saved {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-top: 28px;
+  }
+
+  footer {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    padding: 18px 20px 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: rgba(139,147,168,0.5);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flame, .ring-inner, .screen { animation: none !important; transition: none !important; }
+  }
+
+  @media (max-width: 380px) {
+    main { padding: 22px 16px 50px; }
+    .virtue-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-link" href="https://augustineiacopelli.github.io/appaday/">&larr; AppADay</a>
+  <div class="header-right">
+    <span class="app-tag">054 / EXAMEN</span>
+    <button class="gear-btn" onclick="openSettings()" aria-label="Settings" title="Settings">&#9881;</button>
+  </div>
+</header>
+
+<main>
+  <div class="trail" id="trail"></div>
+
+  <!-- INTRO -->
+  <section class="screen active" id="screen-intro">
+    <div class="candle-wrap">
+      <svg viewBox="0 0 120 120" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <rect x="48" y="78" width="24" height="30" rx="2" fill="#1c2236" stroke="rgba(232,163,61,0.3)" stroke-width="1"/>
+        <line x1="60" y1="78" x2="60" y2="64" stroke="#5a4632" stroke-width="1.5"/>
+        <g class="flame">
+          <ellipse cx="60" cy="58" rx="9" ry="16" fill="var(--candle)" opacity="0.18"/>
+          <path d="M60 46 C 65 54, 67 60, 60 70 C 53 60, 55 54, 60 46 Z" fill="var(--candle)"/>
+          <path d="M60 52 C 63 57, 64 61, 60 67 C 56 61, 57 57, 60 52 Z" fill="#fff3d6"/>
+        </g>
+      </svg>
+    </div>
+    <p class="eyebrow">A nightly prayer</p>
+    <h1>The Examen</h1>
+    <p class="lede">An Ignatian practice of looking back on the day with God, five quiet movements, each one a few minutes long. Move through them in order, at your own pace, before sleep.</p>
+    <div class="movements-list">
+      <div class="movement-row"><span class="movement-num">I.</span><span class="movement-name">Gratitude</span></div>
+      <div class="movement-row"><span class="movement-num">II.</span><span class="movement-name">Light</span></div>
+      <div class="movement-row"><span class="movement-num">III.</span><span class="movement-name">Review</span></div>
+      <div class="movement-row"><span class="movement-num">IV.</span><span class="movement-name">Sorrow</span></div>
+      <div class="movement-row"><span class="movement-num">V.</span><span class="movement-name">Grace</span></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="beginExamen()">Begin tonight's Examen</button>
+    </div>
+  </section>
+
+  <!-- STEP 0: Gratitude -->
+  <section class="screen" id="screen-step-0">
+    <p class="eyebrow">Movement I &middot; Gratitude</p>
+    <h2>Lord, for what am I most grateful today?</h2>
+    <p class="prompt">Let the day pass before you slowly. Notice the small gifts as much as the large ones. Rest a moment in thanks before moving on.</p>
+    <div class="breathe-zone">
+      <div class="ring-outer"><div class="ring-inner" id="ring-0"></div></div>
+      <span class="breathe-label" id="breathe-label-0">breathe with the flame</span>
+    </div>
+    <textarea id="journal-0" placeholder="Write a line or two, or leave this empty and simply sit with it..."></textarea>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goStep(-1)">Back</button>
+      <button class="btn-primary" onclick="goStep(1)">Continue</button>
+    </div>
+  </section>
+
+  <!-- STEP 1: Light -->
+  <section class="screen" id="screen-step-1">
+    <p class="eyebrow">Movement II &middot; Light</p>
+    <h2>Lord, give me the light to see myself as you see me.</h2>
+    <p class="prompt">Ask for an honest eye, free of harshness and free of excuse, before looking back at the hours behind you.</p>
+    <div class="breathe-zone">
+      <div class="ring-outer"><div class="ring-inner" id="ring-1"></div></div>
+      <span class="breathe-label" id="breathe-label-1">breathe with the flame</span>
+    </div>
+    <textarea id="journal-1" placeholder="What clarity are you asking for tonight..."></textarea>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goStep(-1)">Back</button>
+      <button class="btn-primary" onclick="goStep(1)">Continue</button>
+    </div>
+  </section>
+
+  <!-- STEP 2: Review -->
+  <section class="screen" id="screen-step-2">
+    <p class="eyebrow">Movement III &middot; Review</p>
+    <h2>Walk back through the day, hour by hour.</h2>
+    <p class="prompt">Where did you feel close to God, and where did you feel far? Notice the movements of consolation and desolation without judging them yet.</p>
+    <div class="breathe-zone">
+      <div class="ring-outer"><div class="ring-inner" id="ring-2"></div></div>
+      <span class="breathe-label" id="breathe-label-2">breathe with the flame</span>
+    </div>
+    <textarea id="journal-2" placeholder="A few moments from today worth naming..."></textarea>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goStep(-1)">Back</button>
+      <button class="btn-primary" onclick="goStep(1)">Continue</button>
+    </div>
+  </section>
+
+  <!-- STEP 3: Sorrow -->
+  <section class="screen" id="screen-step-3">
+    <p class="eyebrow">Movement IV &middot; Sorrow</p>
+    <h2>Lord, I am sorry. Help me see where I fell short.</h2>
+    <p class="prompt">Name what needs naming, gently and honestly. This is not shame, it is the beginning of mercy. Bring it to him as it is.</p>
+    <div class="breathe-zone">
+      <div class="ring-outer"><div class="ring-inner" id="ring-3"></div></div>
+      <span class="breathe-label" id="breathe-label-3">breathe with the flame</span>
+    </div>
+    <textarea id="journal-3" placeholder="What are you bringing him sorrow for tonight..."></textarea>
+    <div class="ai-zone">
+      <button class="btn-ember" id="ai-reflect-btn" onclick="reflectWithAI()">Reflect with AI for confession prep</button>
+      <div class="ai-error" id="ai-error"></div>
+      <div class="ai-results" id="ai-results">
+        <div class="ai-results-label">Possible areas for examination</div>
+        <div class="ai-results-body" id="ai-results-body"></div>
+        <div class="ai-results-disclaimer">This is a private aid to prayer and self-examination, not a confession and not a substitute for it. Nothing here is saved or sent anywhere beyond this one request. Use it or set it aside entirely.</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goStep(-1)">Back</button>
+      <button class="btn-primary" onclick="goStep(1)">Continue</button>
+    </div>
+  </section>
+
+  <!-- STEP 4: Grace -->
+  <section class="screen" id="screen-step-4">
+    <p class="eyebrow">Movement V &middot; Grace</p>
+    <h2>Lord, give me the grace I need for tomorrow.</h2>
+    <p class="prompt">Look forward, not back. Which virtue will tomorrow ask of you? Tap any of the seven to read about it before you choose.</p>
+    <div class="virtue-grid" id="virtue-grid"></div>
+    <textarea id="journal-4" placeholder="Name the grace or virtue you're asking for, and why..."></textarea>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goStep(-1)">Back</button>
+      <button class="btn-primary" onclick="goStep(1)">Finish</button>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="screen" id="screen-close">
+    <div class="candle-wrap">
+      <svg viewBox="0 0 120 120" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <rect x="48" y="78" width="24" height="30" rx="2" fill="#1c2236" stroke="rgba(232,163,61,0.3)" stroke-width="1"/>
+        <line x1="60" y1="78" x2="60" y2="64" stroke="#5a4632" stroke-width="1.5"/>
+        <g class="flame">
+          <ellipse cx="60" cy="58" rx="9" ry="16" fill="var(--candle)" opacity="0.18"/>
+          <path d="M60 46 C 65 54, 67 60, 60 70 C 53 60, 55 54, 60 46 Z" fill="var(--candle)"/>
+          <path d="M60 52 C 63 57, 64 61, 60 67 C 56 61, 57 57, 60 52 Z" fill="#fff3d6"/>
+        </g>
+      </svg>
+    </div>
+    <p class="eyebrow">Closing</p>
+    <h2>Amen.</h2>
+    <p class="closing-prayer">Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end.</p>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="restartExamen()">Begin again another night</button>
+    </div>
+    <p class="nights-saved" id="nights-saved"></p>
+  </section>
+</main>
+
+<footer>AppADay 054 &middot; Daily Examen &middot; ad maiorem Dei gloriam</footer>
+
+<!-- VIRTUE MODAL -->
+<div class="modal-overlay" id="virtue-modal" aria-hidden="true">
+  <div class="modal-card">
+    <p class="modal-eyebrow" id="virtue-modal-type">Cardinal Virtue</p>
+    <h3 class="modal-title" id="virtue-modal-title">Prudence</h3>
+    <p class="modal-body" id="virtue-modal-body"></p>
+    <div class="modal-close-row">
+      <button class="btn-primary" onclick="closeVirtueModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal" aria-hidden="true">
+  <div class="modal-card">
+    <p class="modal-eyebrow">Settings</p>
+    <h3 class="modal-title">AI reflection</h3>
+    <p class="settings-note">An Anthropic API key is needed only for the optional confession-prep reflection in the Sorrow movement. The key stays on this device, in this browser's local storage, and is never sent anywhere but Anthropic's API.</p>
+    <label class="settings-field-label" for="api-key-input">Anthropic API key</label>
+    <input class="settings-input" id="api-key-input" type="password" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+    <div class="settings-status" id="settings-status"></div>
+    <div class="modal-close-row">
+      <button class="btn-ghost" onclick="clearApiKey()">Remove key</button>
+      <button class="btn-primary" onclick="saveApiKey()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var STEP_COUNT = 5;
+  var current = -1; // -1 = intro, 0..4 = steps, 5 = close
+  var trail = document.getElementById('trail');
+  var breatheTimers = [];
+
+  // ---------- progress trail ----------
+  function buildTrail(){
+    trail.innerHTML = '';
+    for (var i = 0; i < STEP_COUNT; i++){
+      var dot = document.createElement('div');
+      dot.className = 'trail-dot';
+      dot.id = 'dot-' + i;
+      trail.appendChild(dot);
+      if (i < STEP_COUNT - 1){
+        var line = document.createElement('div');
+        line.className = 'trail-line';
+        trail.appendChild(line);
+      }
+    }
+  }
+  buildTrail();
+
+  function updateTrail(){
+    for (var i = 0; i < STEP_COUNT; i++){
+      var d = document.getElementById('dot-' + i);
+      d.classList.remove('done', 'active');
+      if (current > i) d.classList.add('done');
+      if (current === i) d.classList.add('active');
+    }
+  }
+
+  function showScreen(id){
+    var all = document.querySelectorAll('.screen');
+    for (var i = 0; i < all.length; i++){ all[i].classList.remove('active'); }
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ---------- breathing ring ----------
+  function startBreathing(stepIndex){
+    var ring = document.getElementById('ring-' + stepIndex);
+    var label = document.getElementById('breathe-label-' + stepIndex);
+    if (!ring) return;
+    var phase = true;
+    function cycle(){
+      if (phase){
+        ring.classList.remove('breathe-out');
+        ring.classList.add('breathe-in');
+        if (label) label.textContent = 'breathe in';
+      } else {
+        ring.classList.remove('breathe-in');
+        ring.classList.add('breathe-out');
+        if (label) label.textContent = 'breathe out';
+      }
+      phase = !phase;
+    }
+    cycle();
+    var t = setInterval(cycle, 4000);
+    breatheTimers.push(t);
+  }
+
+  function clearBreathing(){
+    for (var i = 0; i < breatheTimers.length; i++){ clearInterval(breatheTimers[i]); }
+    breatheTimers = [];
+  }
+
+  // ---------- navigation ----------
+  window.beginExamen = function(){
+    current = 0;
+    trail.classList.add('show');
+    updateTrail();
+    showScreen('screen-step-0');
+    clearBreathing();
+    startBreathing(0);
+  };
+
+  window.goStep = function(direction){
+    clearBreathing();
+    if (current + direction > STEP_COUNT - 1){
+      saveNight();
+      current = STEP_COUNT;
+      trail.classList.remove('show');
+      showScreen('screen-close');
+      renderNightsSaved();
+      return;
+    }
+    if (current + direction < 0){
+      current = -1;
+      trail.classList.remove('show');
+      showScreen('screen-intro');
+      return;
+    }
+    current = current + direction;
+    updateTrail();
+    showScreen('screen-step-' + current);
+    startBreathing(current);
+  };
+
+  window.restartExamen = function(){
+    for (var i = 0; i < STEP_COUNT; i++){
+      var ta = document.getElementById('journal-' + i);
+      if (ta) ta.value = '';
+    }
+    var aiResults = document.getElementById('ai-results');
+    var aiError = document.getElementById('ai-error');
+    if (aiResults) aiResults.classList.remove('show');
+    if (aiError) aiError.classList.remove('show');
+    current = -1;
+    trail.classList.remove('show');
+    showScreen('screen-intro');
+  };
+
+  // ---------- night storage ----------
+  function saveNight(){
+    try {
+      var entry = { date: new Date().toISOString().slice(0,10), movements: [] };
+      var labels = ['Gratitude','Light','Review','Sorrow','Grace'];
+      for (var i = 0; i < STEP_COUNT; i++){
+        var ta = document.getElementById('journal-' + i);
+        var text = ta ? ta.value.trim() : '';
+        if (text.length > 0){
+          entry.movements.push({ name: labels[i], text: text });
+        }
+      }
+      var existingRaw = localStorage.getItem('examen-nights');
+      var nights = [];
+      if (existingRaw){
+        try { nights = JSON.parse(existingRaw) || []; } catch(e){ nights = []; }
+      }
+      nights.push(entry);
+      if (nights.length > 60) nights = nights.slice(nights.length - 60);
+      localStorage.setItem('examen-nights', JSON.stringify(nights));
+    } catch (e) {
+      // localStorage unavailable in this context, silently skip
+    }
+  }
+
+  function renderNightsSaved(){
+    var el = document.getElementById('nights-saved');
+    if (!el) return;
+    try {
+      var raw = localStorage.getItem('examen-nights');
+      var nights = raw ? JSON.parse(raw) : [];
+      if (nights && nights.length > 0){
+        el.textContent = nights.length + ' night' + (nights.length === 1 ? '' : 's') + ' kept on this device';
+      } else {
+        el.textContent = '';
+      }
+    } catch (e) {
+      el.textContent = '';
+    }
+  }
+
+  // ---------- seven virtues ----------
+  var VIRTUES = [
+    { id: 'prudence', name: 'Prudence', type: 'Cardinal Virtue', desc: 'The virtue that disposes practical reason to discern, in every circumstance, our true good and choose the right means of achieving it. Prudence guides the other virtues by setting their rule and measure, helping you see clearly before you act.' },
+    { id: 'justice', name: 'Justice', type: 'Cardinal Virtue', desc: 'The constant and firm will to give God and neighbor their due. Justice toward God is called the virtue of religion; justice toward others means respecting rights, fulfilling obligations, and promoting fairness in relationships and the common good.' },
+    { id: 'fortitude', name: 'Fortitude', type: 'Cardinal Virtue', desc: 'The virtue that ensures firmness in difficulty and constancy in the pursuit of the good. Fortitude strengthens the resolve to resist temptation and to overcome obstacles in the moral life, even at the cost of one\'s own comfort or safety.' },
+    { id: 'temperance', name: 'Temperance', type: 'Cardinal Virtue', desc: 'The virtue that moderates the attraction of pleasures and provides balance in the use of created goods. It ensures the will\'s mastery over instinct and keeps desires within the limits of what is honorable.' },
+    { id: 'faith', name: 'Faith', type: 'Theological Virtue', desc: 'The virtue by which we believe in God and all that He has said and revealed to us, because He is truth itself. Faith is a gift of God, infused by the Holy Spirit, by which we entrust our whole self to Him.' },
+    { id: 'hope', name: 'Hope', type: 'Theological Virtue', desc: 'The virtue by which we desire the kingdom of heaven and eternal life as our happiness, placing our trust in Christ\'s promises and relying on the help of the Holy Spirit, not on our own strength.' },
+    { id: 'charity', name: 'Charity', type: 'Theological Virtue', desc: 'The theological virtue by which we love God above all things for His own sake, and our neighbor as ourselves for the love of God. Charity is the form of all the virtues; it animates and gives shape to every other virtue.' }
+  ];
+
+  function renderVirtueGrid(){
+    var grid = document.getElementById('virtue-grid');
+    grid.innerHTML = '';
+    for (var i = 0; i < VIRTUES.length; i++){
+      (function(v){
+        var card = document.createElement('div');
+        card.className = 'virtue-card';
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        card.innerHTML = '<span class="virtue-type">' + v.type + '</span><span class="virtue-name">' + v.name + '</span>';
+        card.addEventListener('click', function(){ openVirtueModal(v.id); });
+        card.addEventListener('keydown', function(e){
+          if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openVirtueModal(v.id); }
+        });
+        grid.appendChild(card);
+      })(VIRTUES[i]);
+    }
+  }
+  renderVirtueGrid();
+
+  window.openVirtueModal = function(id){
+    var v = null;
+    for (var i = 0; i < VIRTUES.length; i++){ if (VIRTUES[i].id === id){ v = VIRTUES[i]; break; } }
+    if (!v) return;
+    document.getElementById('virtue-modal-type').textContent = v.type;
+    document.getElementById('virtue-modal-title').textContent = v.name;
+    document.getElementById('virtue-modal-body').textContent = v.desc;
+    var overlay = document.getElementById('virtue-modal');
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+  };
+
+  window.closeVirtueModal = function(){
+    var overlay = document.getElementById('virtue-modal');
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+  };
+
+  // ---------- settings / API key ----------
+  function getApiKey(){
+    try { return localStorage.getItem('examen-api-key') || ''; } catch (e) { return ''; }
+  }
+  function setApiKey(key){
+    try { localStorage.setItem('examen-api-key', key); } catch (e) { /* unavailable, skip */ }
+  }
+  function removeApiKey(){
+    try { localStorage.removeItem('examen-api-key'); } catch (e) { /* unavailable, skip */ }
+  }
+
+  window.openSettings = function(){
+    var input = document.getElementById('api-key-input');
+    input.value = getApiKey();
+    document.getElementById('settings-status').textContent = getApiKey() ? 'A key is currently saved on this device.' : '';
+    var overlay = document.getElementById('settings-modal');
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+  };
+
+  window.closeSettings = function(){
+    var overlay = document.getElementById('settings-modal');
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+  };
+
+  window.saveApiKey = function(){
+    var input = document.getElementById('api-key-input');
+    var key = input.value.trim();
+    setApiKey(key);
+    document.getElementById('settings-status').textContent = key ? 'Key saved on this device.' : 'No key entered.';
+    setTimeout(closeSettings, 600);
+  };
+
+  window.clearApiKey = function(){
+    removeApiKey();
+    document.getElementById('api-key-input').value = '';
+    document.getElementById('settings-status').textContent = 'Key removed.';
+  };
+
+  // close modals on overlay click (not on card click)
+  document.getElementById('virtue-modal').addEventListener('click', function(e){
+    if (e.target === this) closeVirtueModal();
+  });
+  document.getElementById('settings-modal').addEventListener('click', function(e){
+    if (e.target === this) closeSettings();
+  });
+
+  // ---------- AI reflection (Sorrow movement) ----------
+  // SIN_REFERENCE holds an app-specific examination of conscience list,
+  // grouped by commandment to mirror the structure of the standalone
+  // Confession app. Paste flags into the "sins" array under each
+  // commandment as they're exported from that app. Empty groups are
+  // skipped automatically, and if every group is empty Claude falls back
+  // to general Catholic moral theology categories instead.
+  var SIN_REFERENCE = [
+    { commandment: "I", title: "I am the Lord your God; you shall not have strange gods before me", sins: ["guilty of simony, buying or selling blessed and Holy items", "ignorant of basic catechism: Act of Contrition, Apostles' Creed, the Ten Commandments, the Seven Sacraments", "believed in fortune telling, horoscopes, the occult, charms, tarot cards, seances, or other occult practices", "caused someone to leave the Catholic Faith", "claims good values but bends or abandons them to fit in with a group", "denied being Catholic", "did not love God with my whole heart", "did not truly love God above all, gave greater importance to things of this world", "uses religion to look like a good Christian rather than wanting to be transformed by God's will", "failed to give time to God each day in prayer", "failed to receive Holy Communion at least once a year, especially during Easter", "denied or doubted that God exists", "hated God", "has false gods given greater attention than God: money, profession, drugs, TV, fame, pleasure", "knowingly read anti-Catholic literature", "took an active part in a non-Catholic worship", "willfully doubted or denied the teachings of the Church, heresy", "left the Catholic Faith", "received communion in the state of mortal sin", "refused to believe what God has revealed to us", "involved in the New Age Movement, Eastern religions, atheism, or agnosticism"] },
+    { commandment: "II", title: "You shall not take the name of the Lord your God in vain", sins: ["cursed or broke an oath or vow", "disrespected God's name by misusing it out of frustration, anger, or to look tough", "got angry with God", "broke a private vow", "murmured or complained against God, blasphemy", "hesitated to mention God's name in appropriate situations with friends and family", "lied under oath", "maligned priests or others consecrated to God", "slandered or insulted a sacred person or object", "took God's name in vain", "used God's name carelessly or uselessly", "wished evil on another person"] },
+    { commandment: "III", title: "Remember to keep holy the Sabbath day", sins: ["ate meat on Fridays of Lent or on Ash Wednesday", "deliberately missed Mass on Sundays or Holy Days of Obligation", "did not acknowledge the true presence of Christ in the Eucharist", "did not fast as required on Ash Wednesday", "did not arrive to Mass on time, or left Mass early", "did not try to observe Sunday as a family day and a day of rest", "did unnecessary servile work, physical labor, on a Sunday", "failed to contribute to the support of the Church", "inattentive at Mass or otherwise failed in reverence for the Most Blessed Sacrament", "received Holy Communion without respect and reverence", "required employees to work on a Sunday", "went to Holy Communion without fasting for one hour from food and drink"] },
+    { commandment: "IV", title: "Honor your father and your mother", sins: ["deprived family of the necessities of life", "did not care for aged and infirm relatives", "disobeyed or disrespected parents or legitimate superiors", "did not try to bring peace into home life", "failed to care for the religious needs of children, early Baptism or proper religious instruction", "failed to educate self on the true teachings of the Church", "gave scandal by word or action, especially to the young", "failed in obedience or reverence to others in authority", "did not give family good religious example", "neglected duties to parents", "neglected duties to spouse", "neglected the material needs of children", "neglected to give good religious example to family"] },
+    { commandment: "V", title: "You shall not kill", sins: ["abused my children", "attempted suicide", "encouraged or condoned sterilization", "engaged in sins against human life, such as artificial insemination or in vitro fertilization", "gave bad example by drug abuse, drinking alcohol to excess, fighting, or quarreling", "gave scandal to someone, leading them into sin", "had an abortion or encouraged someone to have an abortion", "abused alcohol or drugs", "been angry or resentful", "harbored hatred in my heart", "mutilated myself through a form of sterilization", "physically harmed someone", "took part in or approved of mercy killing, euthanasia", "used or caused a spouse to use birth control pills"] },
+    { commandment: "VI", title: "You shall not commit adultery", sins: ["abused marriage rights", "not careful to dress modestly", "committed impure acts alone, masturbation", "committed adultery, impure acts with a married person", "committed fornication, impure acts with another outside marriage", "deliberately looked at or read impure videos, shows, pictures, books, or movies", "did not avoid the occasions of impurity", "did not seek to be chaste in thoughts, words, and actions", "did not try to control thoughts and imaginations", "engaged in homosexual activities", "engaged in sexual activities outside of marriage", "encouraged others to sin by failure to maintain good moral standards", "not been faithful to marriage vows in thought and action", "not respected members of the opposite sex, or treated others as objects", "used contraception or artificial birth control in marriage", "married or advised someone to marry outside the Church", "self or spouse had sterilization done", "practiced artificial birth control by pills, device, or withdrawal", "told or listened to impure stories", "used impure or suggestive words", "willfully entertained impure thoughts or desires"] },
+    { commandment: "VII", title: "You shall not steal", sins: ["cheated someone out of what is justly theirs, such as creditors or insurance companies", "did not fulfill contracts, gave or accepted bribes, rashly gambled or speculated", "did not give a fair wage to employees", "did not give a full day's work for a full day's pay", "did not respect the property of other people", "does not seek to share what is owned with the poor", "envies other people's families or possessions", "has not paid debts promptly", "has not returned or made restitution for what was stolen", "overcharged someone or took advantage of another's hardship or ignorance", "took advantage of the poor, simple, inexperienced, or less fortunate", "makes material possessions the purpose of life", "stole, cheated, or helped and encouraged others to steal or keep stolen goods", "wastes time at work, school, or at home"] },
+    { commandment: "VIII", title: "You shall not bear false witness against your neighbor", sins: ["committed perjury under oath", "did not keep secret what should have been kept confidential", "did not stand up for someone unjustly accused, was a channel for rumors true or not", "damaged another's reputation by exaggeration or made-up stories", "gossiped", "lied", "spoke badly of others behind their back", "was critical, negative, or uncharitable in thoughts of others", "was not sincere in dealings with others"] },
+    { commandment: "IX", title: "You shall not covet your neighbor's wife", sins: ["consented to impure thoughts caused by impure reading, movies, websites, talk, or curiosity", "did not pray at once to banish impure thoughts and temptations", "dwelled on impure thoughts or fantasies for the purpose of arousal", "behaved inappropriately with members of the opposite sex, flirting or being superficial", "looked at pornography in books or on screen", "willfully lusted after another person"] },
+    { commandment: "X", title: "You shall not covet your neighbor's goods", sins: ["does not appreciate own good qualities, constantly compares self with others and grows resentful", "guilty of greed or avarice", "has been very selfish", "lacks trust that God will care for material and spiritual needs", "tries to prove superiority by bragging or buying more things", "jealous of or envied other people, families, or possessions", "made material possessions the purpose of life"] }
+  ];
+
+  function buildSystemPrompt(){
+    var base = "You are a quiet, pastoral aid for a Catholic preparing for the Sacrament of Confession during a nightly Examen. " +
+      "The person will share a private reflection on where they fell short today. " +
+      "Read it gently and suggest, in plain and humble language, two to five possible related sins or areas for examination of conscience that this reflection might point toward, each as a short phrase, organized by which of the Ten Commandments they relate to where that is reasonably clear. " +
+      "Never invent specifics they did not say. Never diagnose mortal versus venial sin. Never moralize or scold. " +
+      "If the reflection is vague, ask one brief clarifying question instead of guessing. " +
+      "Close with a one-sentence reminder that only a priest in confession can absolve, and that this list is only a private aid to memory and honesty before that conversation.";
+
+    var referenceLines = [];
+    for (var i = 0; i < SIN_REFERENCE.length; i++){
+      var group = SIN_REFERENCE[i];
+      if (group.sins && group.sins.length > 0){
+        referenceLines.push("Commandment " + group.commandment + " (" + group.title + "): " + group.sins.join(", "));
+      }
+    }
+    if (referenceLines.length > 0){
+      base += " When relevant, prefer naming items from this examination-of-conscience reference list, organized by commandment, rather than inventing your own categories:\n" + referenceLines.join("\n") + ".";
+    }
+    return base;
+  }
+
+  window.reflectWithAI = function(){
+    var key = getApiKey();
+    var errorEl = document.getElementById('ai-error');
+    var resultsEl = document.getElementById('ai-results');
+    var resultsBody = document.getElementById('ai-results-body');
+    var btn = document.getElementById('ai-reflect-btn');
+    errorEl.classList.remove('show');
+    errorEl.textContent = '';
+
+    if (!key){
+      openSettings();
+      return;
+    }
+
+    var journal = document.getElementById('journal-3').value.trim();
+    if (journal.length === 0){
+      errorEl.textContent = 'Write a few words above first, then reflect.';
+      errorEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Reflecting...';
+    resultsEl.classList.remove('show');
+
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 500,
+        system: buildSystemPrompt(),
+        messages: [
+          { role: 'user', content: journal }
+        ]
+      })
+    })
+    .then(function(res){
+      if (!res.ok){
+        return res.text().then(function(t){ throw new Error('API error (' + res.status + ')'); });
+      }
+      return res.json();
+    })
+    .then(function(data){
+      var textBlocks = (data.content || []).filter(function(item){ return item.type === 'text'; }).map(function(item){ return item.text; });
+      var combined = textBlocks.join('\n\n').trim();
+      if (!combined){
+        throw new Error('No response received.');
+      }
+      resultsBody.textContent = combined;
+      resultsEl.classList.add('show');
+    })
+    .catch(function(err){
+      errorEl.textContent = 'Could not reach the reflection service. Check the API key in Settings and try again.';
+      errorEl.classList.add('show');
+    })
+    .then(function(){
+      btn.disabled = false;
+      btn.textContent = 'Reflect with AI for confession prep';
+    });
+  };
+})();
+</script>
+
+</body>
+</html>
