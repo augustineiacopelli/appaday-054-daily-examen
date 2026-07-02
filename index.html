@@ -1074,7 +1074,13 @@
     })
     .then(function(res){
       if (!res.ok){
-        return res.text().then(function(t){ throw new Error('API error (' + res.status + ')'); });
+        return res.json().then(function(body){
+          var msg = (body && body.error && body.error.message) ? body.error.message : ('HTTP ' + res.status);
+          throw new Error(res.status + ': ' + msg);
+        }).catch(function(e){
+          if (e.message && e.message.indexOf(res.status) === 0) throw e;
+          throw new Error('HTTP ' + res.status);
+        });
       }
       return res.json();
     })
@@ -1082,13 +1088,14 @@
       var textBlocks = (data.content || []).filter(function(item){ return item.type === 'text'; }).map(function(item){ return item.text; });
       var combined = textBlocks.join('\n\n').trim();
       if (!combined){
-        throw new Error('No response received.');
+        throw new Error('No response received from the API.');
       }
       resultsBody.textContent = combined;
       resultsEl.classList.add('show');
     })
     .catch(function(err){
-      errorEl.textContent = 'Could not reach the reflection service. Check the API key in Settings and try again.';
+      var msg = err && err.message ? err.message : 'Unknown error';
+      errorEl.textContent = 'Reflection failed: ' + msg + '. Check your API key in Settings.';
       errorEl.classList.add('show');
     })
     .then(function(){
