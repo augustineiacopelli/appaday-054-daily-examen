@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="manifest" href="https://augustineiacopelli.github.io/appaday/manifests/054.webmanifest">
 <script src="https://augustineiacopelli.github.io/appaday/save.js" defer></script>
+<script src="https://augustineiacopelli.github.io/appaday/keys.js" data-app="054" data-legacy-key="examen-api-key" data-accent="#6A4C93" defer></script>
 <title>Examen | AppADay 054</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -735,12 +736,9 @@
     <p class="modal-eyebrow">Settings</p>
     <h3 class="modal-title">AI reflection</h3>
     <p class="settings-note">An Anthropic API key is needed only for the optional confession-prep reflection in the Sorrow movement. The key stays on this device, in this browser's local storage, and is never sent anywhere but Anthropic's API.</p>
-    <label class="settings-field-label" for="api-key-input">Anthropic API key</label>
-    <input class="settings-input" id="api-key-input" type="password" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
-    <div class="settings-status" id="settings-status"></div>
+    <div id="keyMount"><div class="settings-status">The key manager is loading. If this stays, check your connection and reload.</div></div>
     <div class="modal-close-row">
-      <button class="btn-ghost" onclick="clearApiKey()">Remove key</button>
-      <button class="btn-primary" onclick="saveApiKey()">Save</button>
+      <button class="btn-primary" onclick="closeSettings()">Close</button>
     </div>
   </div>
 </div>
@@ -949,20 +947,8 @@
   };
 
   // ---------- settings / API key ----------
-  function getApiKey(){
-    try { return localStorage.getItem('examen-api-key') || ''; } catch (e) { return ''; }
-  }
-  function setApiKey(key){
-    try { localStorage.setItem('examen-api-key', key); } catch (e) { /* unavailable, skip */ }
-  }
-  function removeApiKey(){
-    try { localStorage.removeItem('examen-api-key'); } catch (e) { /* unavailable, skip */ }
-  }
-
   window.openSettings = function(){
-    var input = document.getElementById('api-key-input');
-    input.value = getApiKey();
-    document.getElementById('settings-status').textContent = getApiKey() ? 'A key is currently saved on this device.' : '';
+    if (window.AppKeys) window.AppKeys.mountSettings(document.getElementById('keyMount'));
     var overlay = document.getElementById('settings-modal');
     overlay.classList.add('show');
     overlay.setAttribute('aria-hidden', 'false');
@@ -972,20 +958,6 @@
     var overlay = document.getElementById('settings-modal');
     overlay.classList.remove('show');
     overlay.setAttribute('aria-hidden', 'true');
-  };
-
-  window.saveApiKey = function(){
-    var input = document.getElementById('api-key-input');
-    var key = input.value.trim();
-    setApiKey(key);
-    document.getElementById('settings-status').textContent = key ? 'Key saved on this device.' : 'No key entered.';
-    setTimeout(closeSettings, 600);
-  };
-
-  window.clearApiKey = function(){
-    removeApiKey();
-    document.getElementById('api-key-input').value = '';
-    document.getElementById('settings-status').textContent = 'Key removed.';
   };
 
   // close modals on overlay click (not on card click)
@@ -1037,8 +1009,8 @@
     return base;
   }
 
-  window.reflectWithAI = function(){
-    var key = getApiKey();
+  window.reflectWithAI = async function(){
+    var key = window.AppKeys ? await window.AppKeys.get() : null;
     var errorEl = document.getElementById('ai-error');
     var resultsEl = document.getElementById('ai-results');
     var resultsBody = document.getElementById('ai-results-body');
@@ -1047,7 +1019,8 @@
     errorEl.textContent = '';
 
     if (!key){
-      openSettings();
+      errorEl.textContent = 'Add your Claude API key with the gear button to continue.';
+      errorEl.classList.add('show');
       return;
     }
 
