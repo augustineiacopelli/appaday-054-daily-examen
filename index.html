@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="manifest" href="https://augustineiacopelli.github.io/appaday/manifests/054.webmanifest">
 <script src="https://augustineiacopelli.github.io/appaday/save.js" defer></script>
+<script src="https://augustineiacopelli.github.io/appaday/models.js"></script>
 <script src="https://augustineiacopelli.github.io/appaday/keys.js" data-app="054" data-legacy-key="examen-api-key" data-accent="#6A4C93" defer></script>
 <title>Examen | AppADay 054</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1044,7 +1045,7 @@
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: (window.AppModels ? window.AppModels.id('sonnet') : ''),
         max_tokens: 500,
         system: buildSystemPrompt(),
         messages: [
