@@ -1046,7 +1046,7 @@
       },
       body: JSON.stringify({
         model: (window.AppModels ? window.AppModels.id('sonnet') : ''),
-        max_tokens: 500,
+        max_tokens: 2000, thinking: (window.AppModels && window.AppModels.thinking ? window.AppModels.thinking('sonnet') : undefined),
         system: buildSystemPrompt(),
         messages: [
           { role: 'user', content: journal }
@@ -1069,14 +1069,15 @@
       var textBlocks = (data.content || []).filter(function(item){ return item.type === 'text'; }).map(function(item){ return item.text; });
       var combined = textBlocks.join('\n\n').trim();
       if (!combined){
-        throw new Error('No response received from the API.');
+        if (data.stop_reason === 'max_tokens') throw new Error('The reply ran out of room before any text was written');
+        throw new Error('No text came back (stop reason: ' + (data.stop_reason || 'unknown') + ')');
       }
       resultsBody.textContent = combined;
       resultsEl.classList.add('show');
     })
     .catch(function(err){
       var msg = err && err.message ? err.message : 'Unknown error';
-      errorEl.textContent = 'Reflection failed: ' + msg + '. Check your API key in Settings.';
+      errorEl.textContent = 'Reflection failed: ' + msg + '.';
       errorEl.classList.add('show');
     })
     .then(function(){
